@@ -34,18 +34,6 @@ app.get('/students', async function(req, res) {
         })
 })
 
-app.post('/students', async function(req, res) {
-    let rows
-    try {
-        rows = await knex.insert(req.body)
-                            .into(table.students)
-                            .returning(['id', 'firstname', 'lastname', 'email', 'created_at'])
-    } catch (err) {
-        return res.status(500).json(answer(500, err, null))
-    }
-    return res.status(200).json(answer(200, null, rows[0]))
-})
-
 app.delete('/students/:user_id', async function(req, res) {
     let rows
     try {
@@ -73,6 +61,30 @@ app.get('/userbyemail/:user_email', async function(req, res) {
         return res.status(500).json(answer(500, err, null))
     }
     return res.status(200).json(answer(200, null, rows))
+})
+
+app.post('/student', async function(req, res) {
+    const data = {
+        firstname: req.body['firstname'],
+        lastname: req.body['lastname'],
+        email: req.body['email']
+    }
+    if (data.firstname == undefined || data.firstname.length == 0) {
+        return res.status(202).json(answer(202, `First name can't be empty`, null))
+    }
+    if (data.lastname == undefined || data.lastname.length == 0) {
+        return res.status(202).json(answer(202, `Last name can't be empty`, null))
+    }
+    // TO DO : check email
+    let rows
+    try {
+        rows = await knex.insert(data)
+                            .into(table.students)
+                            .returning(['id', 'firstname', 'lastname', 'email', 'created_at'])
+    } catch (err) {
+        return res.status(500).json(answer(500, err, null))
+    }
+    return res.status(200).json(answer(200, null, rows[0]))
 })
 
 app.post('/degree', async function(req, res) {
