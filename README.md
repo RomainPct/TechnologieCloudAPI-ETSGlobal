@@ -12,7 +12,7 @@
 - [ ] Récupérer le matricule (l'id) du diplôme / personne
 - [ ] Récupérer les dates de validité du dernier diplôme de l'utilisateur avec un id
 - [ ] Récupérer les statistiques sur un lot de personnes faisant parti d'un lot (statistiques non nominatives pour avoir le taux de réussite, le score moyen etc…)
-- [ ] Pouvoir enregistrer un étudiant
+- [x] Pouvoir enregistrer un étudiant
 - [x] Pouvoir enregistrer un passage d’examen avec le score etc… (Pour les centres de test qui font passé l'examen et veulent enregistrer le résultat)
 
 
