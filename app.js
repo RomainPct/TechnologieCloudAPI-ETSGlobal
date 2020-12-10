@@ -61,18 +61,32 @@ app.delete('/students/:user_id', async function(req, res) {
     return res.status(200).json(answer(200, null, rows))
 })
 
-app.get('/userbyemail/:user_email', async function(req, res) {
+//Check the email
+function validateEmail(email) {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+    return re.test(String(email).toLowerCase())
+}
+
+app.get('/studendid/byemail/:email', async function(req, res) {
+
+    // if the email == false
+    if(!validateEmail(req.params.email)){ 
+        return res.status(202).json(answer(202, `The email isn't valid`, null)) 
+    }
+
+    // else the code is running
     let rows
     try {
-        rows = await knex.select(['id','firstname','lastname','email','created_at'])
+        rows = await knex.select(['id'])
                         .from(table.students)
                         .where({
-                            email: req.params.user_email,
+                            email: req.params.email,
                         })
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
-    return res.status(200).json(answer(200, null, rows))
+    return res.status(200).json(answer(200, null, rows[0]))
 })
 
 app.post('/degree', async function(req, res) {
