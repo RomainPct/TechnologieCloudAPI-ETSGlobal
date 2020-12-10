@@ -1,0 +1,3 @@
+# Configuration
+- Use "npm install" to insall node_modules
+- Launch the server with autoreload thanks to "nodemon app.js"
