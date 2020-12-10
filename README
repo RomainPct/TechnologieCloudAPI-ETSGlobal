@@ -1,3 +1,17 @@
 # Configuration
 - Use "npm install" to insall node_modules
+- Setup a .env file following the env.example model
 - Launch the server with autoreload thanks to "nodemon app.js"
+
+# API Endpoints
+[] Récupérer le score le plus récent d’une personne (score total, score pour la compréhension écrite et orale)
+[] Récupérer le diplôme en format pdf
+[] Récupérer le matricule du diplôme / personne
+[] Récupérer les dates de validité
+[] Récupérer les différents passages du diplôme par un élève (combien de fois, l’a-t-il passé, à quelle date, quelle date de fin de validité) (permet aussi de vérifier l’assiduité)
+[] Récupérer les statistiques sur un lot de personnes (statistiques non nominatives pour avoir le taux de réussite, le score moyen etc…)
+[] Pouvoir enregistrer un passage d’examen avec le score etc… (Pour les centres de test qui font passé l'examen et veulent enregistrer le résultat)
+
+
+# Ressources
+- https://docs.google.com/document/d/1P7g4KkrWEUD1h3jQ-QTtkIfeyPnkA5b_hE68d3I6HnU/edit
