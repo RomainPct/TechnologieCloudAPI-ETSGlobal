@@ -3,7 +3,11 @@ const app = express()
 require('dotenv').config()
 app.use(express.json())
 
-// libraire joi pour vérifier facilement les infos des users
+// libraire joi pour vérifier facilement les infos des students
+const table = {
+    students: 'students',
+    degrees: 'degrees'
+}
 
 const knex = require('knex')({
     client: 'pg',
@@ -19,9 +23,9 @@ const answer = (code, err, data) => ({
     data: data
 })
 
-app.get('/users', async function(req, res) {
+app.get('/students', async function(req, res) {
     knex.select(['id','firstname','lastname','email','created_at'])
-        .from('users')
+        .from(table.students)
         .then(rows => {
             return res.status(200).json(answer(200, null, rows))
         })
@@ -30,11 +34,11 @@ app.get('/users', async function(req, res) {
         })
 })
 
-app.post('/users', async function(req, res) {
+app.post('/students', async function(req, res) {
     let rows
     try {
         rows = await knex.insert(req.body)
-                            .into('users')
+                            .into(table.students)
                             .returning(['id', 'firstname', 'lastname', 'email', 'created_at'])
     } catch (err) {
         return res.status(500).json(answer(500, err, null))
@@ -42,11 +46,11 @@ app.post('/users', async function(req, res) {
     return res.status(200).json(answer(200, null, rows[0]))
 })
 
-app.delete('/users/:user_id', async function(req, res) {
+app.delete('/students/:user_id', async function(req, res) {
     let rows
     try {
         rows = await knex.delete()
-                        .from('users')
+                        .from(table.students)
                         .where({
                             id: req.params.user_id,
                         })
@@ -61,7 +65,7 @@ app.get('/userbyemail/:user_email', async function(req, res) {
     let rows
     try {
         rows = await knex.select(['id','firstname','lastname','email','created_at'])
-                        .from('users')
+                        .from(table.students)
                         .where({
                             email: req.params.user_email,
                         })
@@ -75,7 +79,7 @@ app.post('/degree', async function(req, res) {
     let rows
     try {
         rows = await knex.insert(req.body)
-                        .into('degrees')
+                        .into(table.degrees)
                         .returning(['id', 'user_id', 'score', 'date', 'type'])
     } catch (err) {
         return res.status(500).json(answer(500, err, null))
