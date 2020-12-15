@@ -94,8 +94,7 @@ app.get('/studendid/byfullname/:firstname/:lastname', async function(req,res) {
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
-
-    return res.status(200).json(answer(200, null, rows[0]))
+    return res.status(200).json(answer(200, null, rows[0] ?? {}))
 })
 
 app.post('/student', async function(req, res) {
