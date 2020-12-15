@@ -167,7 +167,7 @@ app.post('/degree', async function(req, res) {
 /**
  * Retrieve degrees info by user_id
 **/
-app.get('/degreesinfo/byuserid/:user_id', async function(req,res) {
+app.get('/degrees/byuserid/:user_id', async function(req,res) {
     let rows
     try {
         rows = await knex.select(['id', 'score', 'date', 'type', 'oral_score', 'writing_score', 'institut'])
@@ -175,11 +175,12 @@ app.get('/degreesinfo/byuserid/:user_id', async function(req,res) {
                         .where({
                             user_id: req.params.user_id
                         })
+                        .orderBy('date', 'asc')
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
 
-    return res.status(200).json(answer(200, null, rows[0] ?? {}))
+    return res.status(200).json(answer(200, null, rows ?? {}))
 })
 
 app.listen(3000)
