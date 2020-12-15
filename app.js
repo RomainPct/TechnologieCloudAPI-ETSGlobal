@@ -78,7 +78,7 @@ app.get('/studendid/byemail/:email', async function(req, res) {
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
-    return res.status(200).json(answer(200, null, rows[0]))
+    return res.status(200).json(answer(200, null, rows[0] ?? {}))
 })
 
 /**
@@ -162,6 +162,24 @@ app.post('/degree', async function(req, res) {
         return res.status(500).json(answer(500, err, null))
     }
     return res.status(200).json(answer(200, null, rows[0]))
+})
+
+/**
+ * Retrieve degrees info by user_id
+**/
+app.get('/degreesinfo/byuserid/:user_id', async function(req,res) {
+    let rows
+    try {
+        rows = await knex.select(['id', 'score', 'date', 'type', 'oral_score', 'writing_score', 'institut'])
+                        .from(table.degrees)
+                        .where({
+                            user_id: req.params.user_id
+                        })
+    } catch(err) {
+        return res.status(500).json(answer(500, err, null))
+    }
+
+    return res.status(200).json(answer(200, null, rows[0] ?? {}))
 })
 
 app.listen(3000)
