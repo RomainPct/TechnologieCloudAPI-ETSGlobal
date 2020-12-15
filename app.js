@@ -1,5 +1,6 @@
 // Config
 require('dotenv').config()
+const fs = require('fs')
 const express = require('express')
 const settings = {
     validityDuration: 60 * 60 * 24 * 365 * 2 * 1000
@@ -259,9 +260,14 @@ app.get('/recentdegree/byuserid/:user_id', async function(req,res) {
  * Get degree as a pdf
 */
 app.get('/degree/asPDF/:degree_id', async function(req, res) {
-    // Check if degree exists
-    // Check if file exists
-    return res.sendFile(`./cdn/degrees/${req.params.degree_id}`)
+    const path = `./cdn/degrees/${req.params.degree_id}.pdf`
+    try {
+        if (fs.existsSync(path)) {
+            return res.sendFile(path, { root : __dirname})
+        } else {
+            return res.status(404).json(answer(404, 'File does not exist', null))
+        }
+    } catch(err) { return res.status(202).json(answer(202, err, null)) }
 })
 
 app.listen(3000)
