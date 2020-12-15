@@ -49,6 +49,10 @@ app.delete('/students/:user_id', async function(req, res) {
     return res.status(200).json(answer(200, null, rows))
 })
 
+/**
+ * Retrieve the id of a person by email
+**/
+
 //Check the email
 function validateEmail(email) {
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -74,6 +78,23 @@ app.get('/studendid/byemail/:email', async function(req, res) {
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
+    return res.status(200).json(answer(200, null, rows[0]))
+})
+
+/**
+ * Retrieve the id of a person by his name & first name
+**/
+app.get('/studendid/byfullname/:firstname/:lastname', async function(req,res) {
+    let rows
+    try {
+        rows = await knex.select(['id'])
+                        .from(table.students)
+                        // transform the firstname and lastname to lowercase
+                        .whereRaw(`LOWER(firstname) = LOWER('${req.params.firstname}') AND LOWER(lastname) = LOWER('${req.params.lastname}')`)
+    } catch(err) {
+        return res.status(500).json(answer(500, err, null))
+    }
+
     return res.status(200).json(answer(200, null, rows[0]))
 })
 
