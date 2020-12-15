@@ -110,7 +110,9 @@ app.post('/student', async function(req, res) {
     if (data.lastname == undefined || data.lastname.length == 0) {
         return res.status(202).json(answer(202, `Last name can't be empty`, null))
     }
-    // TO DO : check email
+    if(!validateEmail(data.email)) {
+        return res.status(202).json(answer(202, `Email is not valid`, null))
+    }
     let rows
     try {
         rows = await knex.insert(data)
@@ -131,13 +133,24 @@ app.post('/degree', async function(req, res) {
         type: req.body['type'],
         institut: req.body['institut']
     }
-    // TO DO : Vérifier si l'user_id correspond à un utilisateur
-    if (isNaN(data.oral_score)) {
-        return res.status(202).json(answer(202, `Oral score must me an integer`, null))
+    // Check if user exist
+    try {
+        const queryResponse = await knex.count('id')
+                        .into(table.students)
+                        .where({ id: data.user_id })
+        if (parseInt(queryResponse[0].count) == 0) {
+            return res.status(202).json(answer(202, `This user does not exist.`, null))
+        }
+    } catch (err) { return res.status(500).json(answer(500, err, null)) }
+    // Check if oral score is right
+    if (isNaN(data.oral_score) || data.oral_score > 500 || data.oral_score < 0) {
+        return res.status(202).json(answer(202, `Oral score must me an integer between 0 and 500.`, null))
     }
-    if (isNaN(data.writting_score)) {
-        return res.status(202).json(answer(202, `Writting score must me an integer`, null))
+    // Check if writting score is right
+    if (isNaN(data.writting_score) || data.writting_score > 500 || data.writting_score < 0 ) {
+        return res.status(202).json(answer(202, `Writting score must me an integer between 0 and 500.`, null))
     }
+    // Check if degree type is valid
     if (data.type != 'TOEFL' && data.type != 'TOEIC') {
         return res.status(202).json(answer(202, `This type of diplom does not exists "${data.type}"`, null))
     }
