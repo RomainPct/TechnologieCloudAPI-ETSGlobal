@@ -5,7 +5,7 @@
 
 # API Endpoints
 - [x] Récupérer l'id d'une personne par son email
-- [ ] Récupérer l'id d'une personne par son nom + prénom
+- [x] Récupérer l'id d'une personne par son nom + prénom
 - [ ] Récupérer le score le plus récent d’une personne par son id (score total, score pour la compréhension écrite et - [ ]ale)
 - [ ] Récupérer tout les diplômes par un élève (combien de fois, l’a-t-il passé, à quelle date, quelle date de fin de validité)
 - [ ] Récupérer le diplôme en format pdf d'une personne par son id
