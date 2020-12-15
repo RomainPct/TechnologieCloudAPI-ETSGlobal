@@ -211,7 +211,7 @@ app.get('/degrees/byuserid/:user_id', async function(req,res) {
                         .where({
                             user_id: req.params.user_id
                         })
-                        .orderBy('date', 'asc')
+                        .orderBy('date', 'desc')
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
