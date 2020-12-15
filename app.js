@@ -3,6 +3,10 @@ const app = express()
 require('dotenv').config()
 app.use(express.json())
 
+const settings = {
+    validityDuration: 60 * 60 * 24 * 365 * 2 * 1000
+}
+
 // libraire joi pour vérifier facilement les infos des students
 const table = {
     students: 'students',
@@ -22,6 +26,11 @@ const answer = (code, err, data) => ({
     error: err,
     data: data
 })
+
+function getExpirationDate(dateStr) {
+    let dt = new Date(dateStr)
+    return new Date(dt.getTime() + settings.validityDuration);
+}
 
 app.get('/students', async function(req, res) {
     knex.select(['id','firstname','lastname','email','created_at'])
@@ -123,31 +132,58 @@ app.post('/student', async function(req, res) {
     return res.status(200).json(answer(200, null, rows[0]))
 })
 
+app.get('/userDegreeValidity/:user_id', async function(req, res) {
+    // Vérifier que l'utilisateur existe
+    if (!(await checkIfUserExists(req.params.user_id))) {
+        return res.status(202).json(answer(202, `This user does not exist.`, null))
+    }
+    // Récupérer son dernier diplome
+    try {
+        const diploms = await knex.select(['date'])
+                                    .from(table.degrees)
+                                    .where({
+                                        user_id: req.params.user_id
+                                    })
+        // Retourner la date d'expiration
+        if (diploms[0] == undefined) {
+            return res.status(202).json(answer(202, null, { expirationDate: null}))
+        }
+        return res.status(200).json(answer(200, null, { expirationDate: getExpirationDate(diploms[0].date)}))
+    } catch (error) { return res.status(500).json(answer(500, error, null)) }
+})
+
+async function checkIfUserExists(userId) {
+    try {
+        const queryResponse = await knex.count('id')
+                        .into(table.students)
+                        .where({ id: userId })
+        return parseInt(queryResponse[0].count) != 0
+    } catch (err) {
+        console.log(err)
+        return false
+    }
+}
+
 app.post('/degree', async function(req, res) {
     let data = {
         user_id: req.body['user_id'],
         oral_score: req.body['oral_score'],
-        writting_score: req.body['writting_score'],
-        score: req.body['oral_score'] + req.body['writting_score'],
+        writing_score: req.body['writing_score'],
+        score: req.body['oral_score'] + req.body['writing_score'],
         type: req.body['type'],
         institut: req.body['institut']
     }
     // Check if user exist
-    try {
-        const queryResponse = await knex.count('id')
-                        .into(table.students)
-                        .where({ id: data.user_id })
-        if (parseInt(queryResponse[0].count) == 0) {
-            return res.status(202).json(answer(202, `This user does not exist.`, null))
-        }
-    } catch (err) { return res.status(500).json(answer(500, err, null)) }
-    // Check if oral score is right
-    if (isNaN(data.oral_score) || data.oral_score > 500 || data.oral_score < 0) {
-        return res.status(202).json(answer(202, `Oral score must me an integer between 0 and 500.`, null))
+    if (!(await checkIfUserExists(data.user_id))) {
+        return res.status(202).json(answer(202, `This user does not exist.`, null))
     }
-    // Check if writting score is right
-    if (isNaN(data.writting_score) || data.writting_score > 500 || data.writting_score < 0 ) {
-        return res.status(202).json(answer(202, `Writting score must me an integer between 0 and 500.`, null))
+    // Check if oral score is right
+    if (isNaN(data.oral_score) || data.oral_score > 495 || data.oral_score < 0) {
+        return res.status(202).json(answer(202, `Oral score must me an integer between 0 and 495.`, null))
+    }
+    // Check if writing score is right
+    if (isNaN(data.writing_score) || data.writing_score > 495 || data.writing_score < 0 ) {
+        return res.status(202).json(answer(202, `writing score must me an integer between 0 and 495.`, null))
     }
     // Check if degree type is valid
     if (data.type != 'TOEFL' && data.type != 'TOEIC') {
@@ -157,7 +193,7 @@ app.post('/degree', async function(req, res) {
     try {
         rows = await knex.insert(data)
                         .into(table.degrees)
-                        .returning(['id', 'user_id', 'oral_score', 'writting_score', 'score', 'date', 'type', 'institut'])
+                        .returning(['id', 'user_id', 'oral_score', 'writing_score', 'score', 'date', 'type', 'institut'])
     } catch (err) {
         return res.status(500).json(answer(500, err, null))
     }
