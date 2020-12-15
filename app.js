@@ -1,17 +1,16 @@
-const express = require('express')
-const app = express()
+// Config
 require('dotenv').config()
-app.use(express.json())
-
+const express = require('express')
 const settings = {
     validityDuration: 60 * 60 * 24 * 365 * 2 * 1000
 }
-
-// libraire joi pour vérifier facilement les infos des students
 const table = {
     students: 'students',
     degrees: 'degrees'
 }
+
+const app = express()
+app.use(express.json())
 
 const knex = require('knex')({
     client: 'pg',
@@ -21,6 +20,7 @@ const knex = require('knex')({
     }
 })
 
+// Utilitarian functions
 const answer = (code, err, data) => ({
     statusCode : code,
     error: err,
@@ -32,6 +32,28 @@ function getExpirationDate(dateStr) {
     return new Date(dt.getTime() + settings.validityDuration);
 }
 
+function validateEmail(email) {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+    return re.test(String(email).toLowerCase())
+}
+
+async function checkIfUserExists(userId) {
+    try {
+        const queryResponse = await knex.count('id')
+                        .into(table.students)
+                        .where({ id: userId })
+        return parseInt(queryResponse[0].count) != 0
+    } catch (err) {
+        console.log(err)
+        return false
+    }
+}
+
+/**
+ * Get all students
+*/
+
 app.get('/students', async function(req, res) {
     knex.select(['id','firstname','lastname','email','created_at'])
         .from(table.students)
@@ -42,6 +64,10 @@ app.get('/students', async function(req, res) {
             return res.status(500).json(answer(500, error, null))
         })
 })
+
+/**
+ * Delete a student by id
+*/
 
 app.delete('/students/:user_id', async function(req, res) {
     let rows
@@ -60,14 +86,7 @@ app.delete('/students/:user_id', async function(req, res) {
 
 /**
  * Retrieve the id of a person by email
-**/
-
-//Check the email
-function validateEmail(email) {
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-
-    return re.test(String(email).toLowerCase())
-}
+*/
 
 app.get('/studendid/byemail/:email', async function(req, res) {
 
@@ -92,7 +111,7 @@ app.get('/studendid/byemail/:email', async function(req, res) {
 
 /**
  * Retrieve the id of a person by his name & first name
-**/
+*/
 app.get('/studendid/byfullname/:firstname/:lastname', async function(req,res) {
     let rows
     try {
@@ -106,6 +125,9 @@ app.get('/studendid/byfullname/:firstname/:lastname', async function(req,res) {
     return res.status(200).json(answer(200, null, rows[0] ?? {}))
 })
 
+/**
+ * Add a student to the database
+*/
 app.post('/student', async function(req, res) {
     const data = {
         firstname: req.body['firstname'],
@@ -132,6 +154,9 @@ app.post('/student', async function(req, res) {
     return res.status(200).json(answer(200, null, rows[0]))
 })
 
+/**
+ * Check if the degree of a spicific user is still valid
+*/
 app.get('/userDegreeValidity/:user_id', async function(req, res) {
     // Vérifier que l'utilisateur existe
     if (!(await checkIfUserExists(req.params.user_id))) {
@@ -152,18 +177,9 @@ app.get('/userDegreeValidity/:user_id', async function(req, res) {
     } catch (error) { return res.status(500).json(answer(500, error, null)) }
 })
 
-async function checkIfUserExists(userId) {
-    try {
-        const queryResponse = await knex.count('id')
-                        .into(table.students)
-                        .where({ id: userId })
-        return parseInt(queryResponse[0].count) != 0
-    } catch (err) {
-        console.log(err)
-        return false
-    }
-}
-
+/**
+ * Add a degree to the database
+*/
 app.post('/degree', async function(req, res) {
     let data = {
         user_id: req.body['user_id'],
@@ -202,7 +218,7 @@ app.post('/degree', async function(req, res) {
 
 /**
  * Retrieve degrees info by user_id
-**/
+*/
 app.get('/degrees/byuserid/:user_id', async function(req,res) {
     let rows
     try {
@@ -217,6 +233,15 @@ app.get('/degrees/byuserid/:user_id', async function(req,res) {
     }
 
     return res.status(200).json(answer(200, null, rows ?? {}))
+})
+
+/**
+ * Get degree as a pdf
+*/
+app.get('/degree/asPDF/:degree_id', async function(req, res) {
+    // Check if degree exists
+    // Check if file exists
+    return res.sendFile(`./cdn/degrees/${req.params.degree_id}`)
 })
 
 app.listen(3000)
