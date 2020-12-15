@@ -6,7 +6,7 @@
 # API Endpoints
 - [x] Récupérer l'id d'une personne par son email
 - [x] Récupérer l'id d'une personne par son nom + prénom
-- [ ] Récupérer le diplome le plus récent d’une personne selon son user_id (toutes les colonnes possibles)
+- [x] Récupérer le diplome le plus récent d’une personne selon son user_id (toutes les colonnes possibles)
 - [x] Récupérer tous les diplômes selon un user_id (toutes les colonnes possibles)
 - [x] Récupérer le diplôme en format pdf d'une personne par son id
 - [ ] Récupérer l'id des diplôme d'une personne selon son user_id

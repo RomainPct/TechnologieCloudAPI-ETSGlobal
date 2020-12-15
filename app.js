@@ -239,7 +239,7 @@ app.get('/degrees/byuserid/:user_id', async function(req,res) {
 /**
  * Retrieve the most recent degree of a person by his user_id
 */
-app.get('/recentdegree/byuserid/:user_id', async function(req,res) {
+app.get('/lastdegree/byuserid/:user_id', async function(req,res) {
     let rows
     try {
         rows = await knex.select(['id', 'score', 'date', 'type', 'oral_score', 'writing_score', 'institut'])
