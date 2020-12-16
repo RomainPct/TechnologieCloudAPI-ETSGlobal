@@ -243,7 +243,7 @@ app.get('/degrees/byuserid/:user_id', async function(req,res) {
 /**
  * Retrieve id degrees of a person by his user_id
 */
-app.get('/iddegree/byuserid/:user_id', async function(req,res) {
+app.get('/degreesid/byuserid/:user_id', async function(req,res) {
     let rows
     try {
         rows = await knex.select(['id'])
