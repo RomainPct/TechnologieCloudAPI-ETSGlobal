@@ -89,7 +89,7 @@ app.delete('/students/:user_id', async function(req, res) {
  * Retrieve the id of a person by email
 */
 
-app.get('/studendid/byemail/:email', async function(req, res) {
+app.get('/studentid/byemail/:email', async function(req, res) {
 
     // if the email == false
     if(!validateEmail(req.params.email)){ 
@@ -113,7 +113,7 @@ app.get('/studendid/byemail/:email', async function(req, res) {
 /**
  * Retrieve the id of a person by his name & first name
 */
-app.get('/studendid/byfullname/:firstname/:lastname', async function(req,res) {
+app.get('/studentid/byfullname/:firstname/:lastname', async function(req,res) {
     let rows
     try {
         rows = await knex.select(['id'])
@@ -270,8 +270,9 @@ app.get('/lastdegree/byuserid/:user_id', async function(req,res) {
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
-    // Rajouter dans rows[0] une propriété expirationDate avec la date d'expiration
-    // La fonction getExpirationDate(date) prend en param la note de passage de l'exam et retourne sa date d'expiration
+    // Add in rows [0] an expirationDate property with the expiration date
+    rows[0].expirationDate = getExpirationDate(rows[0].date)
+
     return res.status(200).json(answer(200, null, rows[0] ?? {}))
 })
 
