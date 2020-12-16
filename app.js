@@ -232,7 +232,7 @@ app.get('/degrees/byuserid/:user_id', async function(req,res) {
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
-
+    // rajouter la date d'expiration pour chaque row
     return res.status(200).json(answer(200, null, rows ?? {}))
 })
 
@@ -270,7 +270,8 @@ app.get('/lastdegree/byuserid/:user_id', async function(req,res) {
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
-
+    // Rajouter dans rows[0] une propriété expirationDate avec la date d'expiration
+    // La fonction getExpirationDate(date) prend en param la note de passage de l'exam et retourne sa date d'expiration
     return res.status(200).json(answer(200, null, rows[0] ?? {}))
 })
 

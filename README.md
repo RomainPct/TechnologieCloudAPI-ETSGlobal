@@ -15,6 +15,10 @@
 - [x] Pouvoir enregistrer un étudiant
 - [x] Pouvoir enregistrer un passage d’examen avec le score etc… (Pour les centres de test qui font passé l'examen et veulent enregistrer le résultat)
 
+- [ ] Rediger la documentation et la designer
+- [ ] Améliorer certains endpoints en rajoutant la date de fin de validité
+- [ ] Remplir la base de données de prod pour que ça ai l'air réel
+
 
 # Ressources
 - https://docs.google.com/document/d/1P7g4KkrWEUD1h3jQ-QTtkIfeyPnkA5b_hE68d3I6HnU/edit
