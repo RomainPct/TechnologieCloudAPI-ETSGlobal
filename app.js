@@ -123,7 +123,7 @@ app.get('/studentid/byfullname/:firstname/:lastname', async function(req,res) {
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
-    return res.status(200).json(answer(200, null, rows[0] ?? {}))
+    return res.status(200).json(answer(200, null, rows ?? {}))
 })
 
 /**
@@ -156,7 +156,7 @@ app.post('/student', async function(req, res) {
 })
 
 /**
- * Check if the degree of a spicific user is still valid
+ * Check if the degree of a specific user is still valid
 */
 app.get('/userDegreeValidity/:user_id', async function(req, res) {
     // Vérifier que l'utilisateur existe

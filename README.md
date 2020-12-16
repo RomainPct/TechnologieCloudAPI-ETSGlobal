@@ -17,7 +17,7 @@
 
 - [ ] Rediger la documentation et la designer
 - [x] Améliorer certains endpoints en rajoutant la date de fin de validité
-- [ ] Ajuster l'api endpoint recherche par nom/prénom pour retourner pas que un seul résultat mais tous
+- [x] Ajuster l'api endpoint recherche par nom/prénom pour retourner pas que un seul résultat mais tous
 - [ ] Remplir la base de données de prod pour que ça ai l'air réel
 
 
