@@ -283,9 +283,48 @@ app.get('/degree/asPDF/:degree_id', async function(req, res) {
         if (fs.existsSync(path)) {
             return res.sendFile(path, { root : __dirname})
         } else {
-            return res.status(404).json(answer(404, 'File does not exist', null))
+            return res.status(202).json(answer(202, 'File does not exist', null))
         }
     } catch(err) { return res.status(202).json(answer(202, err, null)) }
+})
+
+/**
+ * Retrieve statistics about a batch of people
+*/
+app.get('/statistics/:institut/between/:start/:end', async function(req, res) {
+    // Récupérer toutes les diplomes de cette période
+    let degrees
+    try {
+        degrees = await knex.select(['id', 'score', 'date', 'type', 'oral_score', 'writing_score', 'institut'])
+                        .from(table.degrees)
+                        .where({ institut: req.params.institut })
+                        .whereBetween('date', [req.params.start, req.params.end])
+                        .orderBy('score')
+    } catch(err) {
+        return res.status(500).json(answer(500, err, null))
+    }
+    let data = {
+        writingScore: { average: 0, best: 0, worst: 100000 },
+        oralScore: { average: 0, best: 0, worst: 100000 },
+        totalScore: { average: 0, best: 0, worst: 100000 }
+    }
+    degrees.forEach((degree) => {
+        // Writing
+        data.writingScore.average += degree.writing_score
+        if (data.writingScore.best < degree.writing_score) { data.writingScore.best = degree.writing_score }
+        if (data.writingScore.worst >= degree.writing_score) { data.writingScore.worst = degree.writing_score }
+        // Oral
+        data.oralScore.average += degree.oral_score
+        if (data.oralScore.best < degree.oral_score) { data.oralScore.best = degree.oral_score }
+        if (data.oralScore.worst >= degree.oral_score) { data.oralScore.worst = degree.oral_score }
+        // Total
+        if (data.totalScore.best < degree.score) { data.totalScore.best = degree.score }
+        if (data.totalScore.worst >= degree.score) { data.totalScore.worst = degree.score }
+    })
+    data.writingScore.average = data.writingScore.average / degrees.length
+    data.oralScore.average = data.oralScore.average / degrees.length
+    data.totalScore.average = data.writingScore.average + data.oralScore.average
+    return res.status(200).json(answer(200, null, data))
 })
 
 app.listen(3000)

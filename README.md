@@ -11,7 +11,7 @@
 - [x] Récupérer le diplôme en format pdf d'une personne par son id
 - [ ] Récupérer l'id des diplôme d'une personne selon son user_id
 - [x] Récupérer les dates de validité du dernier diplôme de l'utilisateur avec un id
-- [ ] Récupérer les statistiques sur un lot de personnes faisant parti d'un lot (statistiques non nominatives pour avoir le taux de réussite, le score moyen etc…)
+- [x] Récupérer les statistiques sur un lot de personnes faisant parti d'un lot (statistiques non nominatives pour avoir le taux de réussite, le score moyen etc…)
 - [x] Pouvoir enregistrer un étudiant
 - [x] Pouvoir enregistrer un passage d’examen avec le score etc… (Pour les centres de test qui font passé l'examen et veulent enregistrer le résultat)
 

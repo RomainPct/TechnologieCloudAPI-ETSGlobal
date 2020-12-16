@@ -17,7 +17,6 @@ resource "heroku_app" "app_production" {
   name   = "api-etsglobal-production"
   region = "eu"
 }
-
 resource "heroku_addon" "database_production" {
   app  = heroku_app.app_production.name
   plan = "heroku-postgresql:hobby-dev"
@@ -28,7 +27,6 @@ resource "heroku_app" "app_staging" {
   name   = "api-etsglobal-staging"
   region = "eu"
 }
-
 resource "heroku_addon" "database_staging" {
   app  = heroku_app.app_staging.name
   plan = "heroku-postgresql:hobby-dev"
@@ -38,14 +36,12 @@ resource "heroku_addon" "database_staging" {
 resource "heroku_pipeline" "api-etsglobal-app" {
   name = "api-etsglobal-app"
 }
-
 # Couple apps to different pipeline stages
 resource "heroku_pipeline_coupling" "staging" {
   app      = heroku_app.app_staging.name
   pipeline = heroku_pipeline.api-etsglobal-app.id
   stage    = "staging"
 }
-
 resource "heroku_pipeline_coupling" "production" {
   app      = heroku_app.app_production.name
   pipeline = heroku_pipeline.api-etsglobal-app.id
