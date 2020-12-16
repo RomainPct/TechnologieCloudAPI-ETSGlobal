@@ -9,7 +9,7 @@
 - [x] Récupérer le diplome le plus récent d’une personne selon son user_id (toutes les colonnes possibles)
 - [x] Récupérer tous les diplômes selon un user_id (toutes les colonnes possibles)
 - [x] Récupérer le diplôme en format pdf d'une personne par son id
-- [ ] Récupérer l'id des diplôme d'une personne selon son user_id
+- [x] Récupérer l'id des diplômes d'une personne selon son user_id
 - [x] Récupérer les dates de validité du dernier diplôme de l'utilisateur avec un id
 - [x] Récupérer les statistiques sur un lot de personnes faisant parti d'un lot (statistiques non nominatives pour avoir le taux de réussite, le score moyen etc…)
 - [x] Pouvoir enregistrer un étudiant
