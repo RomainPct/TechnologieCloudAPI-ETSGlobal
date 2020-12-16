@@ -237,6 +237,24 @@ app.get('/degrees/byuserid/:user_id', async function(req,res) {
 })
 
 /**
+ * Retrieve id degrees of a person by his user_id
+*/
+app.get('/iddegree/byuserid/:user_id', async function(req,res) {
+    let rows
+    try {
+        rows = await knex.select(['id'])
+                        .from(table.degrees)
+                        .where({
+                            user_id: req.params.user_id
+                        })
+    } catch(err) {
+        return res.status(500).json(answer(500, err, null))
+    }
+
+    return res.status(200).json(answer(200, null, rows ?? {}))
+})
+
+/**
  * Retrieve the most recent degree of a person by his user_id
 */
 app.get('/lastdegree/byuserid/:user_id', async function(req,res) {
