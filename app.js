@@ -327,4 +327,8 @@ app.get('/statistics/:institut/between/:start/:end', async function(req, res) {
     return res.status(200).json(answer(200, null, data))
 })
 
+app.get('*', function(req, res){
+    res.status(404).send('This endpoint does not exist. Please visit out documentation.')
+})
+
 app.listen(process.env.PORT ||3000)
