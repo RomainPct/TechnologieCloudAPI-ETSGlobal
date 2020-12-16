@@ -232,7 +232,11 @@ app.get('/degrees/byuserid/:user_id', async function(req,res) {
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
-    // rajouter la date d'expiration pour chaque row
+    // Add the expiration date for each row
+    rows.forEach(_row => {
+        _row.expirationDate = getExpirationDate(_row.date)
+    })
+
     return res.status(200).json(answer(200, null, rows ?? {}))
 })
 
