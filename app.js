@@ -3,11 +3,16 @@ require('dotenv').config()
 const fs = require('fs')
 const express = require('express')
 const settings = {
-    validityDuration: 60 * 60 * 24 * 365 * 2 * 1000
+    validityDuration: 60 * 60 * 24 * 365 * 2 * 1000,
+    plans: {
+        trainer: 'trainerPack',
+        recruitment: 'recruitmentPack'
+    }
 }
 const table = {
     students: 'students',
-    degrees: 'degrees'
+    degrees: 'degrees',
+    clients: 'clients'
 }
 
 const app = express()
@@ -27,6 +32,26 @@ const answer = (code, err, data) => ({
     error: err,
     data: data
 })
+
+async function checkApiKey(req, res, plan) {
+    if (req.headers.atsglobalkey == undefined) {
+        return res.status(403).json(answer(403, 'Empty API Key', null))
+    }
+    try {
+        const queryResponse = await knex.count('id')
+                        .into(table.clients)
+                        .where({
+                            key: req.headers.atsglobalkey,
+                            plan: plan
+                        })
+        if (queryResponse[0].count == 0) {
+            return res.status(403).json(answer(403, 'Invalid API Key', null))
+        }
+        return false
+    } catch (error) {
+        return res.status(500).json(answer(500, error, null))
+    }
+}
 
 function getExpirationDate(dateStr) {
     let dt = new Date(dateStr)
@@ -52,44 +77,12 @@ async function checkIfUserExists(userId) {
 }
 
 /**
- * Get all students
-*/
-
-app.get('/students', async function(req, res) {
-    knex.select(['id','firstname','lastname','email','created_at'])
-        .from(table.students)
-        .then(rows => {
-            return res.status(200).json(answer(200, null, rows))
-        })
-        .catch(error => {
-            return res.status(500).json(answer(500, error, null))
-        })
-})
-
-/**
- * Delete a student by id
-*/
-
-app.delete('/students/:user_id', async function(req, res) {
-    let rows
-    try {
-        rows = await knex.delete()
-                        .from(table.students)
-                        .where({
-                            id: req.params.user_id,
-                        })
-                        .returning(['id', 'firstname', 'lastname', 'email', 'created_at'])
-    } catch (err) {
-        return res.status(500).json(answer(500, err, null))
-    }
-    return res.status(200).json(answer(200, null, rows))
-})
-
-/**
  * Retrieve the id of a person by email
 */
 
 app.get('/studentid/byemail/:email', async function(req, res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.recruitment)
+    if (keyCheck) { return keyCheck }
 
     // if the email == false
     if(!validateEmail(req.params.email)){ 
@@ -114,6 +107,8 @@ app.get('/studentid/byemail/:email', async function(req, res) {
  * Retrieve the id of a person by his name & first name
 */
 app.get('/studentid/byfullname/:firstname/:lastname', async function(req,res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.recruitment)
+    if (keyCheck) { return keyCheck }
     let rows
     try {
         rows = await knex.select(['id'])
@@ -130,6 +125,8 @@ app.get('/studentid/byfullname/:firstname/:lastname', async function(req,res) {
  * Add a student to the database
 */
 app.post('/student', async function(req, res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.trainer)
+    if (keyCheck) { return keyCheck }
     const data = {
         firstname: req.body['firstname'],
         lastname: req.body['lastname'],
@@ -159,6 +156,8 @@ app.post('/student', async function(req, res) {
  * Check if the degree of a specific user is still valid
 */
 app.get('/userDegreeValidity/:user_id', async function(req, res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.trainer)
+    if (keyCheck) { return keyCheck }
     // Vérifier que l'utilisateur existe
     if (!(await checkIfUserExists(req.params.user_id))) {
         return res.status(202).json(answer(202, `This user does not exist.`, null))
@@ -182,6 +181,8 @@ app.get('/userDegreeValidity/:user_id', async function(req, res) {
  * Add a degree to the database
 */
 app.post('/degree', async function(req, res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.trainer)
+    if (keyCheck) { return keyCheck }
     let data = {
         user_id: req.body['user_id'],
         oral_score: req.body['oral_score'],
@@ -221,6 +222,8 @@ app.post('/degree', async function(req, res) {
  * Retrieve degrees info by user_id
 */
 app.get('/degrees/byuserid/:user_id', async function(req,res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.recruitment)
+    if (keyCheck) { return keyCheck }
     let rows
     try {
         rows = await knex.select(['id', 'score', 'date', 'type', 'oral_score', 'writing_score', 'institut'])
@@ -244,6 +247,8 @@ app.get('/degrees/byuserid/:user_id', async function(req,res) {
  * Retrieve id degrees of a person by his user_id
 */
 app.get('/degreesid/byuserid/:user_id', async function(req,res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.trainer)
+    if (keyCheck) { return keyCheck }
     let rows
     try {
         rows = await knex.select(['id'])
@@ -262,6 +267,8 @@ app.get('/degreesid/byuserid/:user_id', async function(req,res) {
  * Retrieve the most recent degree of a person by his user_id
 */
 app.get('/lastdegree/byuserid/:user_id', async function(req,res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.recruitment)
+    if (keyCheck) { return keyCheck }
     let rows
     try {
         rows = await knex.select(['id', 'score', 'date', 'type', 'oral_score', 'writing_score', 'institut'])
@@ -284,6 +291,8 @@ app.get('/lastdegree/byuserid/:user_id', async function(req,res) {
  * Get degree as a pdf
 */
 app.get('/degree/asPDF/:degree_id', async function(req, res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.trainer)
+    if (keyCheck) { return keyCheck }
     const path = `./cdn/degrees/${req.params.degree_id}.pdf`
     try {
         if (fs.existsSync(path)) {
@@ -298,6 +307,8 @@ app.get('/degree/asPDF/:degree_id', async function(req, res) {
  * Retrieve statistics about a batch of people
 */
 app.get('/statistics/:institut/between/:start/:end', async function(req, res) {
+    const keyCheck = await checkApiKey(req, res, settings.plans.trainer)
+    if (keyCheck) { return keyCheck }
     // Récupérer toutes les diplomes de cette période
     let degrees
     try {
@@ -334,7 +345,7 @@ app.get('/statistics/:institut/between/:start/:end', async function(req, res) {
 })
 
 app.get('*', function(req, res){
-    res.status(404).send('This endpoint does not exist. Please visit out documentation.')
+    res.status(404).send('This endpoint does not exist. Please visit our documentation.')
 })
 
 app.listen(process.env.PORT ||3000)
