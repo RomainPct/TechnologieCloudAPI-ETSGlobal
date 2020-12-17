@@ -7,9 +7,22 @@ terraform {
     }
   }
 }
+
+variable "heroku_email" {
+  description = "Heroku admin email"
+  type        = string
+  sensitive   = true
+}
+
+variable "heroku_api_key" {
+  description = "Heroku api key"
+  type        = string
+  sensitive   = true
+}
+
 provider "heroku" {
-    email = "tellusofficieltv@gmail.com"
-    api_key = "f107daaa-1a1c-47c1-bd6b-6c622666b4ad"
+    email = var.heroku_email
+    api_key = var.heroku_api_key
 }
 
 # Production ressources
