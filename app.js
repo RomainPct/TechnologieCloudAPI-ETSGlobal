@@ -60,7 +60,6 @@ function getExpirationDate(dateStr) {
 
 function validateEmail(email) {
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-
     return re.test(String(email).toLowerCase())
 }
 
@@ -71,7 +70,6 @@ async function checkIfUserExists(userId) {
                         .where({ id: userId })
         return parseInt(queryResponse[0].count) != 0
     } catch (err) {
-        console.log(err)
         return false
     }
 }
@@ -83,13 +81,9 @@ async function checkIfUserExists(userId) {
 app.get('/studentid/byemail/:email', async function(req, res) {
     const keyCheck = await checkApiKey(req, res, settings.plans.recruitment)
     if (keyCheck) { return keyCheck }
-
-    // if the email == false
     if(!validateEmail(req.params.email)){ 
         return res.status(202).json(answer(202, `The email isn't valid`, null)) 
     }
-
-    // else the code is running
     let rows
     try {
         rows = await knex.select(['id'])
@@ -239,7 +233,6 @@ app.get('/degrees/byuserid/:user_id', async function(req,res) {
     rows.forEach(_row => {
         _row.expirationDate = getExpirationDate(_row.date)
     })
-
     return res.status(200).json(answer(200, null, rows ?? {}))
 })
 
@@ -259,7 +252,6 @@ app.get('/degreesid/byuserid/:user_id', async function(req,res) {
     } catch(err) {
         return res.status(500).json(answer(500, err, null))
     }
-
     return res.status(200).json(answer(200, null, rows ?? {}))
 })
 
@@ -298,7 +290,7 @@ app.get('/degree/asPDF/:degree_id', async function(req, res) {
         if (fs.existsSync(path)) {
             return res.sendFile(path, { root : __dirname})
         } else {
-            return res.status(202).json(answer(202, 'File does not exist', null))
+            return res.status(202).json(answer(202, 'This certificate is not available in PDF yet.', null))
         }
     } catch(err) { return res.status(202).json(answer(202, err, null)) }
 })

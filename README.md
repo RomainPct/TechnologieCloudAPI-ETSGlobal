@@ -15,10 +15,10 @@
 - [x] | Pouvoir enregistrer un étudiant
 - [x] | Pouvoir enregistrer un passage d’examen avec le score etc… (Pour les centres de test qui font passé l'examen et veulent enregistrer le résultat)
 
-- [ ] Rediger la documentation et la designer
+- [x] Rediger la documentation et la designer
 - [x] Améliorer certains endpoints en rajoutant la date de fin de validité
 - [x] Ajuster l'api endpoint recherche par nom/prénom pour retourner pas que un seul résultat mais tous
-- [ ] Remplir la base de données de prod pour que ça ai l'air réel
+- [x] Remplir la base de données de prod
 
 
 # Ressources
